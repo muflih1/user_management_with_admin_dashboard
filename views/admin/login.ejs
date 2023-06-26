@@ -1,0 +1,51 @@
+<%- include("../partials/_header.ejs") %>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-3">
+      <% if (error) { %>
+        <div class="alert alert-danger"><%= error %></div>  
+      <% } %>
+      <% if (success) { %>
+        <div class="alert alert-success"><%= success %></div>  
+      <% } %>
+
+      <form id="loginform" method="POST" action="/admin/login" novalidate>
+        <h1 class="h3 mb-3 fw-normal">Admin login</h1>
+    
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email"
+          required>
+          <label for="floatingInput">Email address</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password"
+          required>
+          <label for="floatingPassword">Password</label>
+        </div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+          <a href="/users/login" class="btn btn-outline-secondary">Back to users login</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+  document.getElementById("loginform").addEventListener(
+    "submit",
+    function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (this.checkValidity() === false) {
+        this.classList.add("was-validated");
+      } else {
+        this.submit();
+      }
+    }, false);
+</script>
+
+<%- include("../partials/_footer.ejs") %>

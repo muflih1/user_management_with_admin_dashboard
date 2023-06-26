@@ -1,0 +1,52 @@
+<%- include("../partials/_header.ejs") %>
+
+<div class="container">
+  <div class="py-5">
+    <div class="d-flex justify-content-between mb-3">
+      <h1>Dashboard</h1>
+
+      <div class="d-flex">
+        <div class="me-2">
+          <a href="/admin/users/new" class="btn btn-success">Create new User</a>
+        </div>
+        <form action="/users/logout" method="post">
+          <button class="btn btn-warning">Logout</button>
+        </form>
+      </div>
+    </div>
+
+
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Mobile</th>
+          <th scope="col">Verified</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        <% users.forEach(function (user) { %>
+        <tr>
+          <th scope="row"><%= user._id %></th>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <td><%= user.mobile %></td>
+          <td class="<%= user.isVerified ? "text-success" : "text-danger" %>"><%= user.isVerified ? "Verified" : "Not Verified" %></td>
+          <td>
+            <a href="/admin/users?id=<%= user.id %>" class="btn btn-sm btn-primary">View</a>
+            <a href="/admin/users/<%= user.id %>/edit" class="btn btn-sm btn-info">Edit</a>
+            <form action="/admin/users/<%= user._id %>/destroy?_method=DELETE" method="POST" class="d-inline-block">
+              <button type="submit" class="btn btn-sm btn-danger">Delete</a>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include("../partials/_footer.ejs") %>
