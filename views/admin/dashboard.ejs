@@ -3,7 +3,7 @@
 <div class="container">
   <div class="py-5">
     <div class="d-flex justify-content-between mb-3">
-      <h1>Dashboard</h1>
+      <h1>Admin Panel</h1>
 
       <div class="d-flex">
         <div class="me-2">
@@ -14,6 +14,11 @@
         </form>
       </div>
     </div>
+
+    <form action="/admin/dashboard" class="d-flex w-25 mb-3">
+      <input type="search" class="form-control" name="q" value="<%= q ?? q %>" placeholder="Search" />
+      <button type="submit" class="btn btn-primary ms-3">Search</button>
+    </form>
 
 
 
@@ -29,22 +34,26 @@
         </tr>
       </thead>
       <tbody class="table-group-divider">
-        <% users.forEach(function (user) { %>
-        <tr>
-          <th scope="row"><%= user._id %></th>
-          <td><%= user.name %></td>
-          <td><%= user.email %></td>
-          <td><%= user.mobile %></td>
-          <td class="<%= user.isVerified ? "text-success" : "text-danger" %>"><%= user.isVerified ? "Verified" : "Not Verified" %></td>
-          <td>
-            <a href="/admin/users?id=<%= user.id %>" class="btn btn-sm btn-primary">View</a>
-            <a href="/admin/users/<%= user.id %>/edit" class="btn btn-sm btn-info">Edit</a>
-            <form action="/admin/users/<%= user._id %>/destroy?_method=DELETE" method="POST" class="d-inline-block">
-              <button type="submit" class="btn btn-sm btn-danger">Delete</a>
-            </form>
-          </td>
-        </tr>
-        <% }) %>
+        <% if (users.length > 0) { %>
+          <% users.forEach(function (user) { %>
+          <tr>
+            <th scope="row"><%= user.uid %></th>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= user.mobile %></td>
+            <td class="<%= user.isVerified ? "text-success" : "text-danger" %>"><%= user.isVerified ? "Verified" : "Not Verified" %></td>
+            <td>
+              <a href="/admin/users?id=<%= user.uid %>" class="btn btn-sm btn-primary">View</a>
+              <a href="/admin/users/<%= user.uid %>/edit" class="btn btn-sm btn-info">Edit</a>
+              <form action="/admin/users/<%= user.uid %>/destroy?_method=DELETE" method="POST" class="d-inline-block">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</a>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <h1 class="py-3">No Users found!</h1>
+        <% } %>
       </tbody>
     </table>
   </div>

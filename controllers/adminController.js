@@ -2,16 +2,11 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
 class RandomString {
-  constructor() {
-    this.length;
+  static generate(length) {
     this.result = "";
     this.characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$-&?.><#@$";
     this.charactersLength = this.characters.length;
-  }
-
-  generate(length) {
-    this.length = length;
     for (var i = 0; i < length; i++) {
       this.result += this.characters.charAt(
         Math.floor(Math.random() * this.charactersLength)
@@ -61,10 +56,17 @@ const adminController = {
   },
 
   dashboard: async (req, res) => {
-    const users = await User.find({});
-    return res.render("admin/dashboard", {
-      users,
-    });
+    const { q } = req.query;
+    if (q) {
+      const users = await User.find({ name: { $regex: ".*" + q + ".*" } });
+      return res.render("admin/dashboard", { users, q });
+    } else {
+      const users = await User.find({});
+      return res.render("admin/dashboard", {
+        users,
+        q: null,
+      });
+    }
   },
 
   newUser: async (req, res) => {
@@ -74,7 +76,7 @@ const adminController = {
   showUser: async (req, res) => {
     const { id } = req.query;
     try {
-      const user = await User.findById(id);
+      const user = await User.findOne({uid: id});
       if (user) {
         return res.render("admin/user_show", { user });
       }
@@ -99,7 +101,7 @@ const adminController = {
       const isExists = await User.findOne({ email });
       if (isExists)
         return res.render("admin/user_new", { error: "User already exists" });
-      const password = new RandomString().generate(8);
+      const password = RandomString.generate(20);
       const hash = await bcrypt.hash(password, 10);
       const user = new User({
         name,
@@ -118,7 +120,7 @@ const adminController = {
 
   editUser: async (req, res) => {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findOne({uid: id});
     return res.render("admin/user_edit", { user });
   },
 
@@ -126,8 +128,8 @@ const adminController = {
     const { id } = req.params;
     const { name, email, mobile, isVerified } = req.body;
     try {
-      const user = await User.findByIdAndUpdate(
-        id,
+      const user = await User.findOneAndUpdate(
+        {uid: id},
         {
           $set: {
             name,
@@ -153,10 +155,10 @@ const adminController = {
   },
 
   destroyUser: async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     try {
       await User.findByIdAndDelete(id);
-      return res.redirect('/admin/dashboard');
+      return res.redirect("/admin/dashboard");
     } catch (e) {
       console.log(e);
     }

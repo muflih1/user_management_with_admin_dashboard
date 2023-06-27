@@ -1,7 +1,12 @@
 const { Schema, model } = require("mongoose");
+const {v4: uuidv4} = require("uuid")
 
 const userSchema = new Schema(
   {
+    uid: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -32,5 +37,9 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
+
+userSchema.pre("validate", function() {
+  this.uid = uuidv4();
+})
 
 module.exports = model("User", userSchema);
