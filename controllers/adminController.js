@@ -43,7 +43,7 @@ const adminController = {
         });
 
       if (user.isAdmin === 1) {
-        req.session.user_id = user._id;
+        req.session.admin_session = user._id;
         return res.redirect("/admin/dashboard");
       }
 
@@ -61,7 +61,7 @@ const adminController = {
       const users = await User.find({ name: { $regex: ".*" + q + ".*" } });
       return res.render("admin/dashboard", { users, q });
     } else {
-      const users = await User.find({});
+      const users = await User.find({ isAdmin: 0 });
       return res.render("admin/dashboard", {
         users,
         q: null,
@@ -76,7 +76,7 @@ const adminController = {
   showUser: async (req, res) => {
     const { id } = req.query;
     try {
-      const user = await User.findOne({uid: id});
+      const user = await User.findOne({ uid: id });
       if (user) {
         return res.render("admin/user_show", { user });
       }
@@ -120,7 +120,7 @@ const adminController = {
 
   editUser: async (req, res) => {
     const { id } = req.params;
-    const user = await User.findOne({uid: id});
+    const user = await User.findOne({ uid: id });
     return res.render("admin/user_edit", { user });
   },
 
@@ -129,7 +129,7 @@ const adminController = {
     const { name, email, mobile, isVerified } = req.body;
     try {
       const user = await User.findOneAndUpdate(
-        {uid: id},
+        { uid: id },
         {
           $set: {
             name,
@@ -157,7 +157,10 @@ const adminController = {
   destroyUser: async (req, res) => {
     const { id } = req.params;
     try {
-      await User.findByIdAndDelete(id);
+      const user = await User.findOneAndDelete({ uid: id });
+      if (req.session.user_session === user._id) {
+        req.session.destroy();
+      }
       return res.redirect("/admin/dashboard");
     } catch (e) {
       console.log(e);

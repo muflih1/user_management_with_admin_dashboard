@@ -8,10 +8,14 @@ const userController = {
 
   loginShowController: (req, res) => {
     const { error, success } = req.query;
-    return res.render("users/login", {
-      error,
-      success,
-    });
+    try {
+      return res.render("users/login", {
+        error,
+        success,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   },
 
   createController: async (req, res) => {
@@ -84,7 +88,7 @@ const userController = {
           )}`
         );
 
-      req.session.user_id = user._id;
+      req.session.user_session = user._id;
 
       return res.redirect("/");
 
@@ -100,8 +104,9 @@ const userController = {
 
   showUserPage: async (req, res) => {
     try {
-      const user = await User.findOne({ _id: req.session.user_id });
-      if (user.isVerified === 0)
+      const user = await User.findOne({ _id: req.session.user_session });
+      if (!user) return res.redirect('/users/register');
+      if (user && user.isVerified === 0)
         return res.redirect(
           `/users/login?error=${encodeURIComponent(
             "Need verification to login"
@@ -112,14 +117,14 @@ const userController = {
         isAdmin: user.isAdmin,
       });
     } catch (e) {
-      console.log(e);
+      res.send(e);
     }
   },
 
   editController: async (req, res) => {
     const {id} = req.params;
     try {
-      const user = await User.findById(id);
+      const user = await User.findOne({uid: id});
       console.log(user);
       res.render('users/edit', { user });
     } catch (e) {

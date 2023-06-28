@@ -1,9 +1,9 @@
 const adminController = require('../controllers/adminController');
-const { isLoggedOut, isAdmin } = require('../middlewares/isAdmin');
+const { isLoggedOut, isAdmin, isAdminIsLoggedOut } = require('../middlewares/isAdmin');
 const router = require('express').Router();
 
-router.get('/login', isLoggedOut, adminController.loginGet)
-router.post('/login', isLoggedOut, adminController.login)
+router.get('/login', isAdminIsLoggedOut, adminController.loginGet)
+router.post('/login', isAdminIsLoggedOut, adminController.login)
 router.get('/users', isAdmin, adminController.showUser);
 router.get('/dashboard', isAdmin, adminController.dashboard)
 router.get('/users/new', isAdmin, adminController.newUser);
